@@ -1,0 +1,85 @@
+---
+- name: Update wpa_supplicant file
+  template: src=../templates/wpa_supplicant.conf.j2 dest=/etc/wpa_supplicant/wpa_supplicant.conf mode=0600
+
+- name: Enable packet forwarding
+  lineinfile:
+    dest: /etc/sysctl.conf
+    regexp: "^#?net.ipv4.ip_forward"
+    line: "net.ipv4.ip_forward=1"
+    state: present
+
+- name: Create /etc/network/iptables
+  template: src=../files/iptables dest=/etc/network/iptables mode=0755
+
+- name: Set /etc/network/interfaces
+  template: src=../templates/interfaces.j2 dest=/etc/network/interfaces
+
+- name: Adding ssh key to pi user
+  user:
+    name: pi
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+
+- name: Install dhcp server
+  apt: name=isc-dhcp-server
+
+- name: Set dhcp server interface to bridge
+  lineinfile:
+    dest: /etc/default/isc-dhcp-server
+    regexp: "^INTERFACES="
+    line: "INTERFACES=\"br0\""
+    state: present
+
+- name: Set /etc/dhcp/dhcpd.conf
+  template: src=../templates/dhcpd.conf.j2 dest=/etc/dhcp/dhcpd.conf
+
+- name: Set /etc/dhcp/dhclient.conf
+  template: src=../templates/dhclient.conf.j2 dest=/etc/dhcp/dhclient.conf
+
+- name: Install dns server
+  become: yes
+  apt: name={{item}}
+  with_items:
+    - bind9
+    - dnsutils
+
+- name: Set named config files
+  template: src=../templates/{{item.src}} dest=/etc/bind/{{item.dest}}
+  with_items:
+  - src: named.conf.options.j2
+    dest: named.conf.options
+  - src: named.conf.local.j2
+    dest: named.conf.local
+  - src: db.192.168.2.zone.j2
+    dest: db.192.168.2.zone
+  - src: db.domain.zone.j2
+    dest: db.{{domain}}.zone
+
+- name: Install hostapd
+  apt: name={{item}}
+  with_items:
+    - hostapd
+
+- name: Set /etc/hostapd/hostapd.conf
+  template: 
+    src: ../templates/hostapd.conf.j2 
+    dest: /etc/hostapd/hostapd.conf
+    owner: root
+    group: bin
+    mode: 0600
+
+- name: Install pip
+  apt: name={{item}}
+  with_items:
+    - python-pip
+    - python-dev
+    - libffi-dev
+    - libssl-dev
+    - sshpass
+
+- name: Install ansible
+  pip: name={{item}}
+  with_items:
+    - ansible

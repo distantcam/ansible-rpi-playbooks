@@ -1,0 +1,16 @@
+---
+ansible_user: pi
+ansible_ssh_pass: raspberry
+github: distantcam
+locale: "en_AU.UTF-8"
+keyboard: "pc104"
+keyboard_layout: "us"
+timezone: Australia/Perth
+
+locale_options:
+  # Disable Default (GB) Locale
+  - regexp: "^en_GB.UTF-8 UTF-8"
+    line: "# en_GB.UTF-8 UTF-8"
+  # Enable AU Locale
+  - regexp: "^# en_AU.UTF-8 UTF-8"
+    line: "en_AU.UTF-8 UTF-8"

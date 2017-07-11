@@ -1,0 +1,20 @@
+;
+; BIND data file for local clusterhat
+;
+$TTL    7200
+@       IN      SOA     {{domain}}. root.{{domain}}. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns.{{domain}}.
+@       IN      A       192.168.2.1
+@       IN      AAAA    ::1
+ns      IN      A       192.168.2.1
+controller      IN      A       192.168.2.1
+p1      IN      A       192.168.2.101
+p2      IN      A       192.168.2.102
+p3      IN      A       192.168.2.103
+p4      IN      A       192.168.2.104

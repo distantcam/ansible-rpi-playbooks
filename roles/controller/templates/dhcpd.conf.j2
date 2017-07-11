@@ -1,0 +1,42 @@
+ddns-update-style none;
+option domain-name "{{ domain }}";
+
+# If this DHCP server is the official DHCP server for the local
+# network, the authoritative directive should be uncommented.
+authoritative;
+
+# Use this to send dhcp log messages to a different log file (you also
+# have to hack syslog.conf to complete the redirection).
+log-facility local7;
+
+subnet 192.168.2.0 netmask 255.255.255.0 {
+        range 192.168.2.201 192.168.2.250;
+
+        option routers                  192.168.2.1;
+        option subnet-mask              255.255.255.0;
+        option broadcast-address        192.168.2.255;
+#        option domain-name-servers      {{ ansible_default_ipv4.gateway }};
+#        option netbios-name-servers     {{ ansible_default_ipv4.gateway }};
+        option domain-name-servers      192.168.2.1;
+        option netbios-name-servers     192.168.2.1;
+        option netbios-node-type 2;
+        default-lease-time 86400;
+        max-lease-time 86400;
+
+        host p1 {
+                hardware ethernet 00:22:82:FF:FF:01;
+                fixed-address 192.168.2.101;
+        }
+        host p2 {
+                hardware ethernet 00:22:82:FF:FF:02;
+                fixed-address 192.168.2.102;
+        }
+        host p3 {
+                hardware ethernet 00:22:82:FF:FF:03;
+                fixed-address 192.168.2.103;
+        }
+        host p4 {
+                hardware ethernet 00:22:82:FF:FF:04;
+                fixed-address 192.168.2.104;
+        }
+}

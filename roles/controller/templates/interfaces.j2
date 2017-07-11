@@ -1,0 +1,32 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto lo br0
+iface lo inet loopback
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+    pre-up brctl addif br0 wlan0
+
+allow-hotplug wlan1
+iface wlan1 inet dhcp
+    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+iface br0 inet static
+        pre-up /etc/network/iptables
+        address 192.168.2.1
+        network 192.168.2.0
+        netmask 255.255.255.0
+        broadcast 192.168.2.255
+        bridge_ports ethpi1 ethpi2 ethpi3 ethpi4
+        bridge_stp off
+        bridge_waitport 0
+        bridge_fd 0
+
+dns-nameservers 127.0.0.1
+dns-search {{domain}}

@@ -1,0 +1,9 @@
+---
+- name: Configure option values in /boot/config.txt file.
+  become: yes
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items: "{{ boot_config_options }}"

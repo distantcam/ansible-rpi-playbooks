@@ -1,0 +1,26 @@
+---
+- name: Check that the docker file exists
+  stat:
+    path: /etc/docker
+  register: stat_result
+
+- name: Install docker
+  script: ../files/install_docker.sh
+  when: stat_result.stat.exists == False 
+
+- name: Create docker group
+  group: 
+    name: docker
+    state: present
+  notify: 
+  - restart docker
+
+- name: Add user to docker group
+  user: 
+    name: pi
+    groups: docker
+    append: yes
+  notify: 
+  - restart docker
+
+- meta: flush_handlers

@@ -1,0 +1,60 @@
+---
+- name: Check unpartitioned space
+  shell: parted /dev/mmcblk0 unit gb print free | grep 'Free Space' | tail -n1 | awk '{print $3}'
+  register: unpartitioned
+  changed_when: false
+
+- name: Expand filesystem to fill disk
+  command: raspi-config --expand-rootfs
+  when: unpartitioned.stdout != "0.00GB"
+  notify:
+  - Restart
+  - Wait for restart to finish
+
+- name: Configure option values in /etc/locale.gen file.
+  lineinfile:
+    dest: /etc/locale.gen
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    backrefs: yes
+  with_items: "{{ locale_options }}"
+
+- name: Generate Locale
+  locale_gen: name={{ locale }}
+
+- name: Set Locale
+  template: src=../templates/locale.j2 dest=/etc/default/locale
+
+- name: Write timezone file
+  copy: content="{{ timezone }}" dest=/etc/timezone
+
+- name: Copy keyboard file
+  template: src=../templates/keyboard.j2 dest=/etc/default/keyboard
+
+- name: Enable SSH
+  service:
+    name: ssh
+    enabled: yes
+
+- name: Set authorized key taken from github
+  authorized_key:
+    user: pi
+    state: present
+    key: https://github.com/{{github}}.keys
+
+- name: Set message of the day
+  copy: src=../files/motd-{{ ansible_hostname }} dest=/etc/motd
+
+- name: Update apt packages
+  apt: 
+    upgrade: dist
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install avahi
+  apt: name={{item}}
+  with_items:
+    - avahi-daemon
+
+- meta: flush_handlers

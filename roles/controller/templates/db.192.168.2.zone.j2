@@ -1,0 +1,17 @@
+;
+; BIND reverse data file for local 192.168.2.* interface
+;
+$TTL    604800
+@       IN      SOA     {{domain}}. root.{{domain}}. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      localhost.
+1       IN      PTR     controller.{{domain}}.
+101     IN      PTR     p1.{{domain}}.
+102     IN      PTR     p2.{{domain}}.
+103     IN      PTR     p3.{{domain}}.
+104     IN      PTR     p4.{{domain}}.

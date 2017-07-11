@@ -1,3 +1,4 @@
+# ansible-playbook -i hosts clusterhat.yml
 ---
 
 - hosts: all

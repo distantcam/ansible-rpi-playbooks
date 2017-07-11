@@ -8,9 +8,11 @@
     regexp: "^#?net.ipv4.ip_forward"
     line: "net.ipv4.ip_forward=1"
     state: present
+  notify:
+  - Temp enable packet forwarding
 
-- name: Create /etc/network/iptables
-  template: src=../files/iptables dest=/etc/network/iptables mode=0755
+- name: Create /etc/network/iptables.sh
+  template: src=../files/iptables.sh dest=/etc/network/iptables.sh mode=0755
 
 - name: Set /etc/network/interfaces
   template: src=../templates/interfaces.j2 dest=/etc/network/interfaces
@@ -42,8 +44,8 @@
   become: yes
   apt: name={{item}}
   with_items:
-    - bind9
-    - dnsutils
+  - bind9
+  - dnsutils
 
 - name: Set named config files
   template: src=../templates/{{item.src}} dest=/etc/bind/{{item.dest}}
@@ -60,7 +62,9 @@
 - name: Install hostapd
   apt: name={{item}}
   with_items:
-    - hostapd
+  - hostapd
+  notify:
+  - Restart hostapd
 
 - name: Set /etc/hostapd/hostapd.conf
   template: 
@@ -69,6 +73,8 @@
     owner: root
     group: bin
     mode: 0600
+  notify:
+  - Restart hostapd
 
 - name: Set hostapd config
   lineinfile:
@@ -76,6 +82,10 @@
     regexp: ^#?DAEMON_CONF
     line: DAEMON_CONF="/etc/hostapd/hostapd.conf"
     state: present
+  notify:
+  - Restart hostapd
+
+- meta: flush_handlers
 
 - name: Install pip
   apt: name={{item}}

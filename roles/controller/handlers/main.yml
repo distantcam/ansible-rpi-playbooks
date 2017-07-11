@@ -1,0 +1,8 @@
+---
+- name: Restart hostapd
+  service:
+    name: hostapd
+    state: restarted
+
+- name: Temp enable packet forwarding
+  copy: content=1 dest=/proc/sys/net/ipv4/ip_forward

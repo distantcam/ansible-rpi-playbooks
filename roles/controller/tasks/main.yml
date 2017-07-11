@@ -70,6 +70,13 @@
     group: bin
     mode: 0600
 
+- name: Set hostapd config
+  lineinfile:
+    dest: /etc/default/hostapd
+    regexp: ^#?DAEMON_CONF
+    line: DAEMON_CONF="/etc/hostapd/hostapd.conf"
+    state: present
+
 - name: Install pip
   apt: name={{item}}
   with_items:

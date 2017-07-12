@@ -1,0 +1,6 @@
+---
+- name: Set authorized key from controller
+  authorized_key:
+    user: pi
+    state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

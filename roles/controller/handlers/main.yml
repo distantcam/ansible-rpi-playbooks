@@ -1,4 +1,9 @@
 ---
+- name: Restart dhcp
+  service:
+    name: isc-dhcp-server
+    state: restarted
+
 - name: Restart hostapd
   service:
     name: hostapd

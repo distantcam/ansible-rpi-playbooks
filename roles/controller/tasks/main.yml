@@ -26,6 +26,9 @@
 
 - name: Install dhcp server
   apt: name=isc-dhcp-server
+  notify:
+  - Restart
+  - Wait for restart to finish
 
 - name: Set dhcp server interface to bridge
   lineinfile:

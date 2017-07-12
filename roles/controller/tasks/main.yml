@@ -24,6 +24,12 @@
     ssh_key_bits: 4096
     ssh_key_file: .ssh/id_rsa
 
+- name: Set authorized key from controller
+  authorized_key:
+    user: pi
+    state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
 - name: Install dhcp server
   apt: name=isc-dhcp-server
   notify:

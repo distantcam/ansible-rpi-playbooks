@@ -1,22 +1,22 @@
 ---
 # Taken from https://github.com/nextrevision/ansible-swarm-playbook/blob/master/swarm.yml
+# https://thisendout.com/2016/09/13/deploying-docker-swarm-with-ansible/
 # determine the status of each manager node and break them
 # into two groups:
 #   - swarm_manager_operational (swarm is running and active)
 #   - swarm_manager_bootstrap (host needs to be joined to the cluster)
-- hosts: controller
+- hosts: controllers
   become: true
   tasks:
-    - name: determine swarm status
-      shell: >
-        docker info | egrep '^Swarm: ' | cut -d ' ' -f2
-      register: swarm_status
+    - name: load docker info as facts
+      docker_info_facts:
+
     - name: create swarm_manager_operational group
       add_host:
         hostname: "{{ item }}"
         groups: swarm_manager_operational
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'active' in hostvars[item].swarm_status.stdout_lines"
+      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' == 'active'"
       run_once: true
 
     - name: create swarm_manager_bootstrap group
@@ -24,7 +24,7 @@
         hostname: "{{ item }}"
         groups: swarm_manager_bootstrap
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'active' not in hostvars[item].swarm_status.stdout_lines"
+      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' != 'active'"
       run_once: true
 
 # determine the status of each worker node and break them
@@ -34,16 +34,15 @@
 - hosts: nodes
   become: true
   tasks:
-    - name: determine swarm status
-      shell: >
-        docker info | egrep '^Swarm: ' | cut -d ' ' -f2
-      register: swarm_status
+    - name: load docker info as facts
+      docker_info_facts:
+
     - name: create swarm_worker_operational group
       add_host:
         hostname: "{{ item }}"
         groups: swarm_worker_operational
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'active' in hostvars[item].swarm_status.stdout_lines"
+      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' == 'active'"
       run_once: true
 
     - name: create swarm_worker_bootstrap group
@@ -51,7 +50,7 @@
         hostname: "{{ item }}"
         groups: swarm_worker_bootstrap
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
-      when: "'active' not in hostvars[item].swarm_status.stdout_lines"
+      when: "'{{ hostvars[item]['docker_info']['Swarm']['LocalNodeState'] }}' != 'active'"
       run_once: true
 
 # when the swarm_manager_operational group is empty, meaning there
@@ -63,7 +62,7 @@
     - name: initialize swarm cluster
       shell: >
         docker swarm init
-        --advertise-addr={{ swarm_iface | default('eth0') }}:2377
+        --advertise-addr={{ swarm_iface | default('wlan1') }}:2377
       when: "'swarm_manager_operational' not in groups"
       register: bootstrap_first_node
 
@@ -79,7 +78,7 @@
 - hosts: swarm_manager_operational[0]
   become: true
   vars:
-    iface: "{{ swarm_iface | default('eth0') }}"
+    iface: "{{ swarm_iface | default('wlan1') }}"
   tasks:
     - name: retrieve swarm manager token
       shell: docker swarm join-token -q manager
@@ -95,7 +94,7 @@
         groups: swarm_manager_ips
       with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
 
-# join the manager hosts not yet initialized to the swarm cluster
+# join the hosts not yet initialized to the swarm cluster
 - hosts: swarm_manager_bootstrap:!swarm_manager_operational
   become: true
   vars:
@@ -104,11 +103,11 @@
     - name: join manager nodes to cluster
       shell: >
         docker swarm join
-        --advertise-addr={{ swarm_iface | default('eth0') }}:2377
+        --advertise-addr={{ swarm_iface | default('wlan1') }}:2377
         --token={{ token }}
         {{ groups['swarm_manager_ips'][0] }}:2377
 
-# join the worker hosts not yet initialized to the swarm cluster
+# join the remaining workers to the swarm cluster
 - hosts: swarm_worker_bootstrap
   become: true
   vars:
@@ -117,6 +116,6 @@
     - name: join worker nodes to cluster
       shell: >
         docker swarm join
-        --advertise-addr={{ swarm_iface | default('eth0') }}:2377
+        --advertise-addr={{ swarm_iface | default('usb0') }}:2377
         --token={{ token }}
         {{ groups['swarm_manager_ips'][0] }}:2377

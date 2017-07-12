@@ -113,3 +113,11 @@
   pip: name={{item}}
   with_items:
     - ansible
+
+- name: Create ansible hosts file
+  copy: src=../files/hosts dest=/etc/ansible/hosts
+
+- name: Copy helper scripts
+  copy: src=../files/{{item}} dest=/sbin/{{item}}
+  with_items:
+  - nodes-shutdown.sh

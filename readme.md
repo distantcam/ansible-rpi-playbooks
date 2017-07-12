@@ -20,3 +20,9 @@ controller
 [nodes]
 p[1:4]
 ```
+
+## Custom settings
+
+There are some custom settings in roles/common/vars/main.yml to do with locale. Change them to your location.
+
+The `github` value is used to download the public key for using with ssh. You can upload your keys to your account at https://github.com/settings/keys and then change the value of `github` to your username and the script will use your key for the controller.

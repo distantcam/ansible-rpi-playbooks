@@ -1,23 +1,6 @@
 # ansible-playbook -i hosts clusterhat.yml
 ---
 
-- vars_prompt:
-  - name: domain
-    prompt: "Please enter the domain for your new device"
-    default: "clusterhat"
-  - name: ap_ssid
-    prompt: "Please enter the access point SSID for your new device"
-    default: "Pi_Cluster_Admin"
-  - name: ap_password
-    prompt: "Please enter the access point password for your new device"
-    private: yes
-  - name: wifi_ssid
-    prompt: "Please enter the WiFi SSID for your new device"
-    private: no
-  - name: wifi_password
-    prompt: "Please enter the WiFi password for your new device"
-    private: yes
-
 - hosts: all
   roles:
   - common
@@ -31,6 +14,22 @@
   - docker
   remote_user: pi
   become: yes
+  vars_prompt:
+    - name: domain
+      prompt: "Please enter the domain for your new device"
+      default: "clusterhat"
+    - name: ap_ssid
+      prompt: "Please enter the access point SSID for your new device"
+      default: "Pi_Cluster_Admin"
+    - name: ap_password
+      prompt: "Please enter the access point password for your new device"
+      private: yes
+    - name: wifi_ssid
+      prompt: "Please enter the WiFi SSID for your new device"
+      private: no
+    - name: wifi_password
+      prompt: "Please enter the WiFi password for your new device"
+      private: yes
 
 - hosts: nodes
   roles:

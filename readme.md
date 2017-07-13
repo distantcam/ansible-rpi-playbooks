@@ -31,7 +31,8 @@ The `github` value is used to download the public key for using with ssh. You ca
 
 This sets up a docker swarm with the controller as the manager, and the nodes as workers. Run on the controller.
 
-    $ ansible-playbook -i hosts swarm.yml
+    $ ssh-copy-id controller
+    $ ansible-playbook swarm.yml
 
 ## Other things to do
 

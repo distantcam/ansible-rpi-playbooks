@@ -20,4 +20,4 @@
   become: true
 
 - name: Wait for restart to finish
-  local_action: wait_for host={{ ansible_host }} port=22 state=started delay=10 timeout=120
+  local_action: wait_for host={{ ansible_host }} port=22 state=started delay=10 timeout=180

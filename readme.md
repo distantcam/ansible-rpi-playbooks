@@ -44,3 +44,7 @@ Alex Ellis (@alexellis) has a great project FaaS https://github.com/alexellis/fa
     $ cd faas
     $ git checkout 0.5.6b-alpha
     $ ./deploy_stack.armhf.sh
+
+Alex also has a demo project for the blinkt displays.
+
+    $ docker service create --name progressbar --mount type=bind,source=/sys,destination=/sys --mode global  --constraint node.role==worker alexellis2/progress-blinkt:blue

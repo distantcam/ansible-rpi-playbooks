@@ -49,4 +49,8 @@ Alex Ellis (@alexellis) has a great project FaaS https://github.com/alexellis/fa
 
 Alex also has a demo project for the blinkt displays.
 
-    $ docker service create --name progressbar --mount type=bind,source=/sys,destination=/sys --mode global  --constraint node.role==worker alexellis2/progress-blinkt:blue
+    $ docker service create --name progressbar --mount type=bind,source=/sys,destination=/sys --mode global --constraint node.role==worker alexellis2/progress-blinkt:blue
+
+Docker Swarm Monitor https://github.com/StefanScherer/swarm-monitor
+
+    $ docker service create --name monitor --mode global --restart-condition any --constraint node.role==worker --mount type=bind,src=/sys,dst=/sys --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock stefanscherer/monitor:latest

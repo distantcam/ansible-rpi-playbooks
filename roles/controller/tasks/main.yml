@@ -120,7 +120,7 @@
   copy: src=../files/hosts dest=/etc/ansible/hosts
 
 - name: Copy helper scripts
-  copy: src=../files/{{item}} dest=/sbin/{{item}} mode=0755
+  copy: src=../files/{{item}}.sh dest=/sbin/{{item}} mode=0755
   with_items:
-  - nodes-poweroff.sh
-  - nodes-reboot.sh
+  - nodes-poweroff
+  - nodes-reboot

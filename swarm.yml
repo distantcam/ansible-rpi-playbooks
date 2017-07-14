@@ -5,7 +5,7 @@
 # into two groups:
 #   - swarm_manager_operational (swarm is running and active)
 #   - swarm_manager_bootstrap (host needs to be joined to the cluster)
-- hosts: manager
+- hosts: controllers
   become: true
   tasks:
     - name: determine swarm status
@@ -33,7 +33,7 @@
 # into two groups:
 #   - swarm_worker_operational (host is joined to the swarm cluster)
 #   - swarm_worker_bootstrap (host needs to be joined to the cluster)
-- hosts: worker
+- hosts: nodes
   become: true
   tasks:
     - name: determine swarm status

@@ -54,3 +54,29 @@ Alex also has a demo project for the blinkt displays.
 Docker Swarm Monitor https://github.com/StefanScherer/swarm-monitor
 
     $ docker service create --name monitor --mode global --restart-condition any --constraint node.role==worker --mount type=bind,src=/sys,dst=/sys --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock stefanscherer/monitor:latest
+
+## Remote edit code in Visual Studio Code
+
+I'm a Windows developer, and I like using Visual Studio Code to edit files. There's a really neat way to edit files from the Raspberry Pi remotely in Visual Studio Code.
+
+In Visual Studio Code, install the plugin Remote VSCode https://marketplace.visualstudio.com/items?itemName=rafaelmaiolla.remote-vscode Add the required settings to your user settings.
+
+```
+{
+    "remote.port": 52698,
+    "remote.onstartup": true
+}
+```
+
+Now ssh into your raspberry pi and create a ssh tunnel with the rmate port
+
+    $ ssh -R 52698:localhost:52698 pi@controller.local
+
+Now install rmate from https://github.com/aurora/rmate
+
+    $ sudo wget -O /usr/local/bin/rmate https://raw.github.com/aurora/rmate/master/rmate
+    $ sudo chmod a+x /usr/local/bin/rmate
+
+And finally you should be able to edit a file using rmate.
+
+    $ rmate file.txt

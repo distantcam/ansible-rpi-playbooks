@@ -9,7 +9,8 @@
     line: "net.ipv4.ip_forward=1"
     state: present
   notify:
-  - Temp enable packet forwarding
+  - Restart
+  - Wait for restart to finish
 
 - name: Create /etc/network/iptables.sh
   template: src=../files/iptables.sh dest=/etc/network/iptables.sh mode=0755

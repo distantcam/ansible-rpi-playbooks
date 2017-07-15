@@ -9,9 +9,6 @@
     name: hostapd
     state: restarted
 
-- name: Temp enable packet forwarding
-  copy: content=1 dest=/proc/sys/net/ipv4/ip_forward
-
 - name: Restart
   command: /sbin/shutdown -r +0 'Ansible Reboot triggered'
   async: 0
@@ -20,4 +17,4 @@
   become: true
 
 - name: Wait for restart to finish
-  local_action: wait_for host={{ ansible_host }} port=22 state=started delay=10 timeout=180
+  local_action: wait_for host={{ ansible_ssh_host }} port=22 state=started delay=10 timeout=180
